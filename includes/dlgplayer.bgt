@@ -1,0 +1,52 @@
+#include"sound_pool.bgt"
+sound_pool temppool;
+void dlg(string message, string soundpath, bool dlgcoppy=false)
+{
+temppool.play_stationary(soundpath, false);
+speak(message);
+while(true)
+{
+if (key_pressed(KEY_LEFT) or key_pressed(KEY_RIGHT) or key_pressed(KEY_UP) or key_pressed(KEY_DOWN))
+{
+speak(message);
+}
+if (key_pressed(KEY_C) and dlgcoppy==true)
+{
+clipboard_copy_text(message);
+pool.play_stationary("lib/hrtfs/h/s/misc/clipcopy.ogg", false);
+speak("Copied");
+}
+if (key_pressed(KEY_RETURN) or key_pressed(KEY_ESCAPE))
+{
+break;
+}
+}
+}
+void dlgplay(string dlgsound, bool dlgfade=false, bool dlgskip=false, int dlgvolume=0, int fadespeed=30)
+{
+sound dlgaudio;
+dlgaudio.load(dlgsound);
+dlgaudio.volume=dlgvolume;
+dlgaudio.play();
+while(dlgaudio.playing)
+{
+if(key_pressed(KEY_RETURN) and dlgskip==true)
+{
+if (dlgfade==true)
+{
+fade(dlgaudio, -50, fadespeed);
+}
+dlgaudio.stop();
+break;
+}
+if(key_pressed(KEY_ESCAPE) and dlgskip==true)
+{
+if (dlgfade==true)
+{
+fade(dlgaudio, -50, fadespeed);
+}
+dlgaudio.stop();
+break;
+}
+}
+}

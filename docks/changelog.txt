@@ -1,0 +1,2 @@
+new in 1.0
+Made changing effects more streamlined in the code.

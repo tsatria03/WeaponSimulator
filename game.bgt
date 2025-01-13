@@ -1,0 +1,331 @@
+#include"includes/includes.bgt"
+string[] dock, dock2;
+string docksplit, changesplit;
+file docks, docks2, opt;
+dynamic_menu_pro m;
+sound_pool pool;
+text_input input;
+void main()
+{
+if(!screen_reader_set_library_path(NVDA,"lib/nvdaControllerClient32.dll"))
+{
+alert("Error", "There was a problem interacting with the NVDA screen reader.");
+exit();
+}
+show_game_window("game");
+mainmenu();
+}
+void restart()
+{
+if(SCRIPT_COMPILED)
+{
+run("game.exe","",false,false);
+}
+else
+{
+run("C:\\Program Files (x86)\\BGT\\bgt.exe","game.bgt",false,false);
+}
+}
+void volume_scroll_down()
+{
+if(volumeadjust==1 and weaponvolume!=-50 and effectstimer.elapsed>=effectstime)
+{
+if(spokenvalues==1)
+{
+if(volsound==1) switchslot=pool.play_stationary("sounds/misc/voluchange.wav",false);
+pool.update_sound_start_values(switchslot,weaponpan,weaponvolume,weaponpitch);
+speak(weaponvolume/1+49+"percent");
+weaponvolume-=1;
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+effectstimer.restart();
+}
+else if(spokenvalues==0)
+{
+if(volsound==1) switchslot=pool.play_stationary("sounds/misc/voluchange.wav",false);
+pool.update_sound_start_values(switchslot,weaponpan,weaponvolume,weaponpitch);
+weaponvolume-=1;
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+effectstimer.restart();
+}
+}
+}
+void volume_scroll_up()
+{
+if(volumeadjust==1 and weaponvolume!=0 and effectstimer.elapsed>=effectstime)
+{
+if(spokenvalues==1)
+{
+if(volsound==1) switchslot=pool.play_stationary("sounds/misc/voluchange.wav",false);
+pool.update_sound_start_values(switchslot,weaponpan,weaponvolume,weaponpitch);
+speak(weaponvolume/1+51+"percent");
+weaponvolume+=1;
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+effectstimer.restart();
+}
+else if(spokenvalues==0)
+{
+if(volsound==1) switchslot=pool.play_stationary("sounds/misc/voluchange.wav",false);
+pool.update_sound_start_values(switchslot,weaponpan,weaponvolume,weaponpitch);
+weaponvolume+=1;
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+effectstimer.restart();
+}
+}
+}
+void volume_step_down()
+{
+if(volumeadjust==1 and weaponvolume!=-50)
+{
+if(spokenvalues==1)
+{
+if(volsound==1) switchslot=pool.play_stationary("sounds/misc/voluchange.wav",false);
+pool.update_sound_start_values(switchslot,weaponpan,weaponvolume,weaponpitch);
+speak(weaponvolume/1+45+"percent");
+weaponvolume-=5;
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+else if(spokenvalues==0)
+{
+if(volsound==1) switchslot=pool.play_stationary("sounds/misc/voluchange.wav",false);
+pool.update_sound_start_values(switchslot,weaponpan,weaponvolume,weaponpitch);
+weaponvolume-=5;
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+}
+}
+void volume_step_up()
+{
+if(volumeadjust==1 and weaponvolume!=0)
+{
+if(spokenvalues==1)
+{
+if(volsound==1) switchslot=pool.play_stationary("sounds/misc/voluchange.wav",false);
+pool.update_sound_start_values(switchslot,weaponpan,weaponvolume,weaponpitch);
+speak(weaponvolume/1+55+"percent");
+weaponvolume+=5;
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+else if(spokenvalues==0)
+{
+if(volsound==1) switchslot=pool.play_stationary("sounds/misc/voluchange.wav",false);
+pool.update_sound_start_values(switchslot,weaponpan,weaponvolume,weaponpitch);
+weaponvolume+=5;
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+}
+}
+void pitch_scroll_down()
+{
+if(pitchadjust==1 and weaponpitch!=0 and effectstimer.elapsed>=effectstime)
+{
+if(spokenvalues==1)
+{
+if(pitchsound==1) switchslot=pool.play_stationary("sounds/misc/pitchchange.ogg",false);
+pool.update_sound_start_values(switchslot,weaponpan,weaponvolume,weaponpitch);
+speak(weaponpitch/2-1+"percent");
+weaponpitch-=2;
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+effectstimer.restart();
+}
+else if(spokenvalues==0)
+{
+if(pitchsound==1) switchslot=pool.play_stationary("sounds/misc/pitchchange.ogg",false);
+pool.update_sound_start_values(switchslot,weaponpan,weaponvolume,weaponpitch);
+weaponpitch-=2;
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+effectstimer.restart();
+}
+}
+}
+void pitch_scroll_up()
+{
+if(pitchadjust==1 and weaponpitch!=200 and effectstimer.elapsed>=effectstime)
+{
+if(spokenvalues==1)
+{
+if(pitchsound==1) switchslot=pool.play_stationary("sounds/misc/pitchchange.ogg",false);
+pool.update_sound_start_values(switchslot,weaponpan,weaponvolume,weaponpitch);
+speak(weaponpitch/2+1+"percent");
+weaponpitch+=2;
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+effectstimer.restart();
+}
+else if(spokenvalues==0)
+{
+if(pitchsound==1) switchslot=pool.play_stationary("sounds/misc/pitchchange.ogg",false);
+pool.update_sound_start_values(switchslot,weaponpan,weaponvolume,weaponpitch);
+weaponpitch+=2;
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+effectstimer.restart();
+}
+}
+}
+void pitch_step_down()
+{
+if(pitchadjust==1 and weaponpitch!=0)
+{
+if(spokenvalues==1)
+{
+if(pitchsound==1) switchslot=pool.play_stationary("sounds/misc/pitchchange.ogg",false);
+pool.update_sound_start_values(switchslot,weaponpan,weaponvolume,weaponpitch);
+speak(weaponpitch/2-5+"percent");
+weaponpitch-=10;
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+else if(spokenvalues==0)
+{
+if(pitchsound==1) switchslot=pool.play_stationary("sounds/misc/pitchchange.ogg",false);
+pool.update_sound_start_values(switchslot,weaponpan,weaponvolume,weaponpitch);
+weaponpitch-=10;
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+}
+}
+void pitch_step_up()
+{
+if(pitchadjust==1 and weaponpitch!=200)
+{
+if(spokenvalues==1)
+{
+if(pitchsound==1) switchslot=pool.play_stationary("sounds/misc/pitchchange.ogg",false);
+pool.update_sound_start_values(switchslot,weaponpan,weaponvolume,weaponpitch);
+speak(weaponpitch/2+5+"percent");
+weaponpitch+=10;
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+else if(spokenvalues==0)
+{
+if(pitchsound==1) switchslot=pool.play_stationary("sounds/misc/pitchchange.ogg",false);
+pool.update_sound_start_values(switchslot,weaponpan,weaponvolume,weaponpitch);
+weaponpitch+=10;
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+}
+}
+void pan_scroll_down()
+{
+if(panadjust==1 and weaponpan!=-50 and effectstimer.elapsed>=effectstime)
+{
+if(spokenvalues==1)
+{
+if(pansound==1) switchslot=pool.play_stationary("sounds/misc/panchange.wav",false);
+pool.update_sound_start_values(switchslot,weaponpan,weaponvolume,weaponpitch);
+speak(weaponpan/1+49+"percent");
+weaponpan-=1;
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+effectstimer.restart();
+}
+else if(spokenvalues==0)
+{
+if(pansound==1) switchslot=pool.play_stationary("sounds/misc/panchange.wav",false);
+pool.update_sound_start_values(switchslot,weaponpan,weaponvolume,weaponpitch);
+weaponpan-=1;
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+effectstimer.restart();
+}
+}
+}
+void pan_scroll_up()
+{
+if(panadjust==1 and weaponpan!=50 and effectstimer.elapsed>=effectstime)
+{
+if(spokenvalues==1)
+{
+if(pansound==1) switchslot=pool.play_stationary("sounds/misc/panchange.wav",false);
+pool.update_sound_start_values(switchslot,weaponpan,weaponvolume,weaponpitch);
+speak(weaponpan/1+51+"percent");
+weaponpan+=1;
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+effectstimer.restart();
+}
+else if(spokenvalues==0)
+{
+if(pansound==1) switchslot=pool.play_stationary("sounds/misc/panchange.wav",false);
+pool.update_sound_start_values(switchslot,weaponpan,weaponvolume,weaponpitch);
+weaponpan+=1;
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+effectstimer.restart();
+}
+}
+}
+void pan_step_down()
+{
+if(panadjust==1 and weaponpan!=-50)
+{
+if(spokenvalues==1)
+{
+if(pansound==1) switchslot=pool.play_stationary("sounds/misc/panchange.wav",false);
+pool.update_sound_start_values(switchslot,weaponpan,weaponvolume,weaponpitch);
+speak(weaponpan/1+45+"percent");
+weaponpan-=5;
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+else if(spokenvalues==0)
+{
+if(pansound==1) switchslot=pool.play_stationary("sounds/misc/panchange.wav",false);
+pool.update_sound_start_values(switchslot,weaponpan,weaponvolume,weaponpitch);
+weaponpan-=5;
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+}
+}
+void pan_step_up()
+{
+if(panadjust==1 and weaponpan!=50)
+{
+if(spokenvalues==1)
+{
+if(pansound==1) switchslot=pool.play_stationary("sounds/misc/panchange.wav",false);
+pool.update_sound_start_values(switchslot,weaponpan,weaponvolume,weaponpitch);
+speak(weaponpan/1+55+"percent");
+weaponpan+=5;
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+else if(spokenvalues==0)
+{
+if(pansound==1) switchslot=pool.play_stationary("sounds/misc/panchange.wav",false);
+pool.update_sound_start_values(switchslot,weaponpan,weaponvolume,weaponpitch);
+weaponpan+=5;
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+}
+}
+void reset_volume()
+{
+if(weaponvolume==0 and resetvolume==1)
+{
+speak("Volume is already reset.");
+}
+else if(weaponvolume<=0 and resetvolume==1)
+{
+speak("volume reset");
+weaponvolume=0;
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+}
+void reset_pan()
+{
+if(weaponpan==0 and resetpan==1)
+{
+speak("Pan is already reset.");
+}
+else if(weaponpan<=50 and resetpan==1)
+{
+speak("pan reset");
+weaponpan=0;
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+}
+void reset_pitch()
+{
+if(weaponpitch==100 and resetpitch==1)
+{
+speak("Pitch is already reset");
+}
+else if(weaponpitch<=200 and resetpitch==1)
+{
+speak("pitch reset");
+weaponpitch=100;
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+}

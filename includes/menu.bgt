@@ -1,0 +1,709 @@
+int keytime=200, menumusic=0, spacehold=1, up_down=0, left_right=1, home_end=1, wrap=1, repeat_items=1, numbers=0, first_letter=1, position_info=0, side_scroll=0;
+string menutrack="part1";
+string clicksound="menuclick2";
+string edgesound="menuedge2";
+string entersound="menuenter27";
+string opensound="menuopen15";
+string wrapsound="menuwrap5";
+string[] mctrack=find_files("sounds/menus/music/"+menutrack+"/music*");
+string[] mclick=find_files("sounds/menus/click/"+clicksound+"/*click*");
+string[] menter=find_files("sounds/menus/enter/"+entersound+"/*enter*");
+string[] mopen=find_files("sounds/menus/open/"+opensound+"/*open*");
+string[] mrap=find_files("sounds/menus/wrap/"+wrapsound+"/*wrap*");
+string[] medge=find_files("sounds/menus/edge/"+edgesound+"/*edge*");
+timer keytimer;
+void setupmenu(bool main=false)
+{
+m.reset(true);
+if (main==true)
+m.add_music("sounds/menus/music/"+menutrack+"/"+mctrack[random(0,mctrack.length()-1)]);
+if(menumusic==0) m.music.volume=-100;
+if(up_down==1) m.enable_up_and_down=true;
+if(left_right==1) m.enable_left_and_right=true;
+if(home_end==1) m.enable_home_and_end=true;
+if(wrap==1) m.wrap=true;
+if(repeat_items==1) m.repeat_items_at_edges=true;
+if(numbers==1) m.enable_numbers=true;
+if(first_letter==1) m.enable_first_letter_navigation=true;
+if(position_info==1) m.speak_position_information=true;
+if(side_scroll==1) m.enable_side_scrolling=true;
+m.click_sound=("sounds/menus/click/"+clicksound+"/"+mclick[random(0,mclick.length()-1)]);
+m.edge_sound=("sounds/menus/edge/"+edgesound+"/"+medge[random(0,medge.length()-1)]);
+m.enter_sound=("sounds/menus/enter/"+entersound+"/"+menter[random(0,menter.length()-1)]);
+m.open_sound=("sounds/menus/open/"+opensound+"/"+mopen[random(0,mopen.length()-1)]);
+m.wrap_sound=("sounds/menus/wrap/"+wrapsound+"/"+mrap[random(0,mrap.length()-1)]);
+}
+void setupmenu2(bool main=false)
+{
+m.reset(true);
+if (main==true)
+m.enable_up_and_down=true;
+m.enable_left_and_right=false;
+m.enable_home_and_end=true;
+m.allow_escape=true;
+m.wrap=false;
+m.repeat_items_at_edges=true;
+m.enable_first_letter_navigation=false;
+m.speak_position_information=false;
+m.click_sound="none.ogg";
+m.enter_sound="none.ogg";
+m.open_sound="none.ogg";
+}
+string clicksmenu()
+{
+string[] mclicksound=find_directories("sounds/menus/click/*");
+setupmenu(true);
+m.set_callback(@clicks_callback,"");
+for (uint i=0; i<mclicksound.length(); i++)
+{
+m.add_item_tts(mclicksound[i],mclicksound[i],"",true);
+}
+int mres=m.run("Click sound menu", true);
+if(mres==0)
+{
+menusounds();
+}
+if(mres==0 and mres>=mclicksound.length())
+{
+menusounds();
+}
+if(mres>0 and mres<=mclicksound.length())
+{
+clicksound=mclicksound[mres-1];
+speak("click sound set");
+menusounds();
+}
+return m.get_item_name(mres);
+}
+int clicks_callback(dynamic_menu_pro@ m, string data)
+{
+string clicksound;
+if(m.menu_position>0)
+clicksound=m.item_list[m.menu_position-1].name;
+if(key_down(KEY_SPACE) and m.menu_position>0 and spacehold==1 and keytimer.elapsed>=keytime)
+{
+string[] mclick=find_files("sounds/menus/click/"+clicksound+"/*click*");
+pool.play_stationary("sounds/menus/click/"+clicksound+"/"+mclick[random(0,mclick.length()-1)],false);
+keytimer.restart();
+}
+if(key_pressed(KEY_SPACE) and m.menu_position>0 and spacehold==0)
+{
+string[] mclick=find_files("sounds/menus/click/"+clicksound+"/*click*");
+pool.play_stationary("sounds/menus/click/"+clicksound+"/"+mclick[random(0,mclick.length()-1)],false);
+}
+return 0;
+}
+string edgesmenu()
+{
+string[] medgesound=find_directories("sounds/menus/edge/*");
+setupmenu(true);
+m.set_callback(@edges_callback,"");
+for (uint i=0; i<medgesound.length(); i++)
+{
+m.add_item_tts(medgesound[i],medgesound[i],"",true);
+}
+int mres=m.run("edge sound menu", true);
+if(mres==0)
+{
+menusounds();
+}
+if(mres==0 and mres>=medgesound.length())
+{
+menusounds();
+}
+if(mres>0 and mres<=medgesound.length())
+{
+edgesound=medgesound[mres-1];
+speak("edge sound set");
+menusounds();
+}
+return m.get_item_name(mres);
+}
+int edges_callback(dynamic_menu_pro@ m, string data)
+{
+string edgesound;
+if(m.menu_position>0)
+edgesound=m.item_list[m.menu_position-1].name;
+if(key_down(KEY_SPACE) and m.menu_position>0 and spacehold==1 and keytimer.elapsed>=keytime)
+{
+string[] medge=find_files("sounds/menus/edge/"+edgesound+"/*edge*");
+pool.play_stationary("sounds/menus/edge/"+edgesound+"/"+medge[random(0,medge.length()-1)],false);
+keytimer.restart();
+}
+if(key_pressed(KEY_SPACE) and m.menu_position>0 and spacehold==0)
+{
+string[] medge=find_files("sounds/menus/edge/"+edgesound+"/*edge*");
+pool.play_stationary("sounds/menus/edge/"+edgesound+"/"+medge[random(0,medge.length()-1)],false);
+}
+return 0;
+}
+string entersmenu()
+{
+string[] mentersound=find_directories("sounds/menus/enter/*");
+setupmenu(true);
+m.set_callback(@enters_callback,"");
+for (uint i=0; i<mentersound.length(); i++)
+{
+m.add_item_tts(mentersound[i],mentersound[i],"",true);
+}
+int mres=m.run("Enter sound menu", true);
+if(mres==0)
+{
+menusounds();
+}
+if(mres==0 and mres>=mentersound.length())
+{
+menusounds();
+}
+if(mres>0 and mres<=mentersound.length())
+{
+entersound=mentersound[mres-1];
+speak("enter sound set");
+menusounds();
+}
+return m.get_item_name(mres);
+}
+int enters_callback(dynamic_menu_pro@ m, string data)
+{
+string entersound;
+if(m.menu_position>0)
+entersound=m.item_list[m.menu_position-1].name;
+if(key_down(KEY_SPACE) and m.menu_position>0 and spacehold==1 and keytimer.elapsed>=keytime)
+{
+string[] menter=find_files("sounds/menus/enter/"+entersound+"/*enter*");
+pool.play_stationary("sounds/menus/enter/"+entersound+"/"+menter[random(0,menter.length()-1)],false);
+keytimer.restart();
+}
+if(key_pressed(KEY_SPACE) and m.menu_position>0 and spacehold==0)
+{
+string[] menter=find_files("sounds/menus/enter/"+entersound+"/*enter*");
+pool.play_stationary("sounds/menus/enter/"+entersound+"/"+menter[random(0,menter.length()-1)],false);
+}
+return 0;
+}
+string opensmenu()
+{
+string[] mopensound=find_directories("sounds/menus/open/*");
+setupmenu(true);
+m.set_callback(@opens_callback,"");
+for (uint i=0; i<mopensound.length(); i++)
+{
+m.add_item_tts(mopensound[i],mopensound[i],"",true);
+}
+int mres=m.run("Open sound menu", true);
+if(mres==0)
+{
+menusounds();
+}
+if(mres==0 and mres>=mopensound.length())
+{
+menusounds();
+}
+if(mres>0 and mres<=mopensound.length())
+{
+opensound=mopensound[mres-1];
+speak("open sound set");
+menusounds();
+}
+return m.get_item_name(mres);
+}
+int opens_callback(dynamic_menu_pro@ m, string data)
+{
+string opensound;
+if(m.menu_position>0)
+opensound=m.item_list[m.menu_position-1].name;
+if(key_down(KEY_SPACE) and m.menu_position>0 and spacehold==1 and keytimer.elapsed>=keytime)
+{
+string[] mopen=find_files("sounds/menus/open/"+opensound+"/*open*");
+pool.play_stationary("sounds/menus/open/"+opensound+"/"+mopen[random(0,mopen.length()-1)],false);
+keytimer.restart();
+}
+if(key_pressed(KEY_SPACE) and m.menu_position>0 and spacehold==0)
+{
+string[] mopen=find_files("sounds/menus/open/"+opensound+"/*open*");
+pool.play_stationary("sounds/menus/open/"+opensound+"/"+mopen[random(0,mopen.length()-1)],false);
+}
+return 0;
+}
+string wrapsmenu()
+{
+string[] mrapsound=find_directories("sounds/menus/wrap/*");
+setupmenu(true);
+m.set_callback(@wraps_callback,"");
+for (uint i=0; i<mrapsound.length(); i++)
+{
+m.add_item_tts(mrapsound[i],mrapsound[i],"",true);
+}
+int mres=m.run("Wrap sound menu", true);
+if(mres==0)
+{
+menusounds();
+}
+if(mres==0 and mres>=mrapsound.length())
+{
+menusounds();
+}
+if(mres>0 and mres<=mrapsound.length())
+{
+wrapsound=mrapsound[mres-1];
+speak("wrap sound set");
+menusounds();
+}
+return m.get_item_name(mres);
+}
+int wraps_callback(dynamic_menu_pro@ m, string data)
+{
+string wrapsound;
+if(m.menu_position>0)
+wrapsound=m.item_list[m.menu_position-1].name;
+if(key_down(KEY_SPACE) and m.menu_position>0 and spacehold==1 and keytimer.elapsed>=keytime)
+{
+string[] mrap=find_files("sounds/menus/wrap/"+wrapsound+"/*wrap*");
+pool.play_stationary("sounds/menus/wrap/"+wrapsound+"/"+mrap[random(0,mrap.length()-1)],false);
+keytimer.restart();
+}
+if(key_pressed(KEY_SPACE) and m.menu_position>0 and spacehold==0)
+{
+string[] mrap=find_files("sounds/menus/wrap/"+wrapsound+"/*wrap*");
+pool.play_stationary("sounds/menus/wrap/"+wrapsound+"/"+mrap[random(0,mrap.length()-1)],false);
+}
+return 0;
+}
+void mainmenu()
+{
+setupmenu(true);
+m.add_item_tts("documentation menu", "help");
+m.add_item_tts("game menu", "weapon");
+m.add_item_tts("settings menu", "settings");
+m.add_item_tts("test speakers", "st");
+m.add_item_tts("restart", "rx");
+m.add_item_tts("exit", "ex");
+int mres=m.run("Main menu. Please choose an option with your arrow keys, then press enter to activate one.",true);
+string main=m.get_item_name(mres);
+if(mres==0)
+{
+speak("exiting");
+if(menumusic==1) m.fade_music(20);
+if(menumusic==0) wait(500);
+exit();
+}
+if(main=="weapon")
+{
+gamemenu();
+}
+if(main=="help")
+{
+docksmenu();
+}
+if(main=="st")
+{
+if(menumusic==1) m.fade_music(20);
+if(menumusic==0) wait(500);
+dlgplay("sounds/misc/speakertest.ogg", true, true, 30);
+mainmenu();
+}
+if(main=="ex")
+{
+speak("exiting");
+if(menumusic==1) m.fade_music(20);
+if(menumusic==0) wait(500);
+exit();
+}
+if(main=="rx")
+{
+speak("restarting");
+if(menumusic==1) m.fade_music(20);
+if(menumusic==0) wait(500);
+restart();
+}
+if(main=="settings")
+{
+settingsmenu();
+}
+}
+void docksmenu()
+{
+setupmenu(true);
+m.add_item_tts("changelog", "changelog");
+m.add_item_tts("readme", "readme");
+m.add_item_tts("back", "back");
+int mres=m.run("documentation menu",true);
+string dnm=m.get_item_name(mres);
+if(mres==0)
+{
+mainmenu();
+}
+if(dnm=="changelog")
+{
+docks.open("docks/changelog.txt","r");
+changesplit=docks.read();
+dock=string_split(changesplit,"\r\n",false);
+setupmenu2(true);
+for(uint i=0; i<dock.length(); i++)
+{
+m.add_item_tts(dock[i],"","",false);
+}
+int mres=m.run("Changelog", true);
+if (mres==0 and mres>=dock.length())
+{
+return;
+}
+if (mres>0 and mres<=dock.length())
+{
+return;
+}
+}
+if(dnm=="readme")
+{
+docks2.open("docks/readme.txt", "r");
+docksplit=docks2.read();
+dock2=string_split(docksplit,"\r\n",false);
+setupmenu2(true);
+for(uint i=0; i<dock2.length(); i++)
+{
+m.add_item_tts(dock2[i],"","",false);
+}
+int mres=m.run("Readme", true);
+if (mres==0 and mres>=dock2.length())
+{
+return;
+}
+if (mres>0 and mres<=dock2.length())
+{
+return;
+}
+}
+if(dnm=="back")
+{
+mainmenu();
+}
+}
+void settingsmenu()
+{
+setupmenu(true);
+m.add_item_tts("select menu sounds", "slm");
+if(menumusic==0)
+m.add_item_tts("enable music in menus", "mtn");
+else
+m.add_item_tts("disable music in menus", "mtn");
+if(up_down==0)
+m.add_item_tts("enable up and down in menus", "pd");
+else
+m.add_item_tts("disable up and down in menus", "pd");
+if(left_right==0)
+m.add_item_tts("enable left and right in menus", "lr");
+else
+m.add_item_tts("disable left and right in menus", "lr");
+if(home_end==0)
+m.add_item_tts("enable home and end in menus", "hd");
+else
+m.add_item_tts("disable home and end in menus", "hd");
+if(wrap==0)
+m.add_item_tts("enable wrapping in menus", "rg");
+else
+m.add_item_tts("disable wrapping in menus", "rg");
+if(repeat_items==0)
+m.add_item_tts("enable repeating items in menus", "rms");
+else
+m.add_item_tts("disable repeating items in menus", "rms");
+if(numbers==0)
+m.add_item_tts("enable number scrolling in menus", "nbs");
+else
+m.add_item_tts("disable number scrolling in menus", "nbs");
+if(first_letter==0)
+m.add_item_tts("enable first letter scrolling in menus", "fls");
+else
+m.add_item_tts("disable first letter scrolling in menus", "fls");
+if(position_info==0)
+m.add_item_tts("enable position information in menus", "psn");
+else
+m.add_item_tts("disable position information in menus", "psn");
+if(side_scroll==0)
+m.add_item_tts("enable side scrolling in menus", "psl");
+else
+m.add_item_tts("disable side scrolling in menus", "psl");
+m.add_item_tts("back", "back");
+int mres=m.run("settings menu",true);
+string ssm=m.get_item_name(mres);
+if(mres==0)
+{
+mainmenu();
+}
+if(ssm=="slm")
+{
+menusounds();
+}
+if(ssm=="mtn")
+{
+if(menumusic==0)
+{
+m.stop_music();
+m.music.volume=0;
+menumusic=1;
+speak("music in menus enabled");
+}
+else
+{
+m.music.volume=-100;
+menumusic=0;
+speak("music in menus disabled");
+}
+settingsmenu();
+}
+if(ssm=="pd")
+{
+if(up_down==0)
+{
+up_down=1;
+speak("up and down in menus enabled");
+}
+else
+{
+m.enable_up_and_down=false;
+up_down=0;
+speak("up and down in menus disabled");
+}
+settingsmenu();
+}
+if(ssm=="lr")
+{
+if(left_right==0)
+{
+left_right=1;
+speak("left and right in menus enabled");
+}
+else
+{
+m.enable_left_and_right=false;
+left_right=0;
+speak("left and right in menus disabled");
+}
+settingsmenu();
+}
+if(ssm=="hd")
+{
+if(home_end==0)
+{
+home_end=1;
+speak("home and end in menus enabled");
+}
+else
+{
+m.enable_home_and_end=false;
+home_end=0;
+speak("home and end in menus disabled");
+}
+settingsmenu();
+}
+if(ssm=="rg")
+{
+if(wrap==0)
+{
+wrap=1;
+speak("wrapping in menus enabled");
+}
+else
+{
+m.wrap=false;
+wrap=0;
+speak("wrapping in menus disabled");
+}
+settingsmenu();
+}
+if(ssm=="rms")
+{
+if(repeat_items==0)
+{
+repeat_items=1;
+speak("repeating items in menus enabled");
+}
+else
+{
+m.repeat_items_at_edges=false;
+repeat_items=0;
+speak("repeating items in menus disabled");
+}
+settingsmenu();
+}
+if(ssm=="nbs")
+{
+if(numbers==0)
+{
+numbers=1;
+speak("number scrolling in menus enabled");
+}
+else
+{
+m.enable_numbers=false;
+numbers=0;
+speak("number scrolling in menus disabled");
+}
+settingsmenu();
+}
+if(ssm=="fls")
+{
+if(first_letter==0)
+{
+first_letter=1;
+speak("first letter scrolling in menus enabled");
+}
+else
+{
+m.enable_first_letter_navigation=false;
+first_letter=0;
+speak("first letter scrolling in menus disabled");
+}
+settingsmenu();
+}
+if(ssm=="psn")
+{
+if(position_info==0)
+{
+position_info=1;
+speak("position info in menus enabled");
+}
+else
+{
+m.speak_position_information=false;
+position_info=0;
+speak("position info in menus disabled");
+}
+settingsmenu();
+}
+if(ssm=="psl")
+{
+if(side_scroll==0)
+{
+side_scroll=1;
+speak("side scrolling in menus enabled");
+}
+else
+{
+m.enable_side_scrolling=false;
+side_scroll=0;
+speak("side scrolling in menus disabled");
+}
+settingsmenu();
+}
+if(ssm=="back")
+{
+mainmenu();
+}
+}
+void menusounds()
+{
+setupmenu(true);
+m.add_item_tts("click sound,"+"currently set to;"+clicksound, "mcs");
+m.add_item_tts("edge sound,"+"currently set to;"+edgesound, "mds");
+m.add_item_tts("enter sound,"+"currently set to;"+entersound, "mrs");
+m.add_item_tts("open sound,"+"currently set to;"+opensound, "mps");
+m.add_item_tts("wrap sound,"+"currently set to;"+wrapsound, "mws");
+m.add_item_tts("back", "back");
+int mres=m.run("Choose the sounds you would like to use in all menus.",true);
+string scm=m.get_item_name(mres);
+if(mres==0)
+{
+settingsmenu();
+}
+if(scm=="mcs")
+{
+string res=clicksmenu();
+if(res!="")
+{
+clicksound=res;
+}
+}
+if(scm=="mds")
+{
+string res=edgesmenu();
+if(res!="")
+{
+edgesound=res;
+}
+}
+if(scm=="mrs")
+{
+string res=entersmenu();
+if(res!="")
+{
+entersound=res;
+}
+}
+if(scm=="mps")
+{
+string res=opensmenu();
+if(res!="")
+{
+opensound=res;
+}
+}
+if(scm=="mws")
+{
+string res=wrapsmenu();
+if(res!="")
+{
+wrapsound=res;
+}
+}
+if(scm=="back")
+{
+settingsmenu();
+}
+}
+void gamemenu()
+{
+setupmenu(true);
+m.add_item_tts("play", "shoot");
+m.add_item_tts("Game settings", "set");
+m.add_item_tts("back", "back");
+int mres=m.run("game menu",true);
+string gamem=m.get_item_name(mres);
+if(mres==0)
+{
+mainmenu();
+}
+if(gamem=="shoot")
+{
+if(menumusic==1) m.fade_music(20);
+wepsim();
+}
+if(gamem=="set")
+{
+gamepreffs();
+}
+if(gamem=="back")
+{
+mainmenu();
+}
+}
+void gamepreffs()
+{
+setupmenu(true);
+m.add_item_tts("Set default health", "hp");
+m.add_item_tts("Set default shieldstrength", "sd");
+m.add_item_tts("back", "back");
+int mres=m.run("Game options",true);
+string gamepm=m.get_item_name(mres);
+if(mres==0)
+{
+gamemenu();
+}
+if(gamepm=="hp")
+{
+string hp=input.input("What would you like your default health to be set to?","10000");
+if(health=="")
+gamepreffs();
+health=string_to_number(hp);
+}
+if(gamepm=="sd")
+{
+string indurence=input.input("What would you like your default shield indurence to be set to?","10000");
+if(shieldstrength=="")
+gamepreffs();
+shieldstrength=string_to_number(indurence);
+}
+if(gamepm=="back")
+{
+gamemenu();
+}
+}
