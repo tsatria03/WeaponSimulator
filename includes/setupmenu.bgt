@@ -1,0 +1,257 @@
+void setupmenu(bool main=false)
+{
+m.reset(true);
+if (main==true)
+m.add_music("sounds/menus/music/"+menutrack+"/"+mctrack[random(0,mctrack.length()-1)]);
+if(menumusic==0) m.music.volume=-100;
+if(up_down==1) m.enable_up_and_down=true;
+if(left_right==1) m.enable_left_and_right=true;
+if(home_end==1) m.enable_home_and_end=true;
+if(wrap==1) m.wrap=true;
+if(repeat_items==1) m.repeat_items_at_edges=true;
+if(numbers==1) m.enable_numbers=true;
+if(first_letter==1) m.enable_first_letter_navigation=true;
+if(position_info==1) m.speak_position_information=true;
+if(side_scroll==1) m.enable_side_scrolling=true;
+m.click_sound=("sounds/menus/click/"+clicksound+"/"+mclick[random(0,mclick.length()-1)]);
+m.edge_sound=("sounds/menus/edge/"+edgesound+"/"+medge[random(0,medge.length()-1)]);
+m.enter_sound=("sounds/menus/enter/"+entersound+"/"+menter[random(0,menter.length()-1)]);
+m.open_sound=("sounds/menus/open/"+opensound+"/"+mopen[random(0,mopen.length()-1)]);
+m.wrap_sound=("sounds/menus/wrap/"+wrapsound+"/"+mrap[random(0,mrap.length()-1)]);
+}
+void setupmenu2(bool main=false)
+{
+m.reset(true);
+if (main==true)
+m.enable_up_and_down=true;
+m.enable_left_and_right=false;
+m.enable_home_and_end=true;
+m.allow_escape=true;
+m.wrap=false;
+m.repeat_items_at_edges=true;
+m.enable_first_letter_navigation=false;
+m.speak_position_information=false;
+m.click_sound="none.ogg";
+m.enter_sound="none.ogg";
+m.open_sound="none.ogg";
+}
+string clicksmenu()
+{
+string[] mclicksound=find_directories("sounds/menus/click/*");
+setupmenu(true);
+m.set_callback(@clicks_callback,"");
+for (uint i=0; i<mclicksound.length(); i++)
+{
+m.add_item_tts(mclicksound[i],mclicksound[i],"",true);
+}
+int mres=m.run("Click sound menu", true);
+if(mres==0)
+{
+menusounds();
+}
+if(mres==0 and mres>=mclicksound.length())
+{
+menusounds();
+}
+if(mres>0 and mres<=mclicksound.length())
+{
+clicksound=mclicksound[mres-1];
+speak("click sound set");
+menusounds();
+}
+return m.get_item_name(mres);
+}
+int clicks_callback(dynamic_menu_pro@ m, string data)
+{
+string clicksound;
+if(m.menu_position>0)
+clicksound=m.item_list[m.menu_position-1].name;
+if(key_down(KEY_SPACE) and m.menu_position>0 and spacehold==1 and keytimer.elapsed>=keytime)
+{
+string[] mclick=find_files("sounds/menus/click/"+clicksound+"/*click*");
+pool.play_stationary("sounds/menus/click/"+clicksound+"/"+mclick[random(0,mclick.length()-1)],false);
+keytimer.restart();
+}
+if(key_pressed(KEY_SPACE) and m.menu_position>0 and spacehold==0)
+{
+string[] mclick=find_files("sounds/menus/click/"+clicksound+"/*click*");
+pool.play_stationary("sounds/menus/click/"+clicksound+"/"+mclick[random(0,mclick.length()-1)],false);
+}
+return 0;
+}
+string edgesmenu()
+{
+string[] medgesound=find_directories("sounds/menus/edge/*");
+setupmenu(true);
+m.set_callback(@edges_callback,"");
+for (uint i=0; i<medgesound.length(); i++)
+{
+m.add_item_tts(medgesound[i],medgesound[i],"",true);
+}
+int mres=m.run("edge sound menu", true);
+if(mres==0)
+{
+menusounds();
+}
+if(mres==0 and mres>=medgesound.length())
+{
+menusounds();
+}
+if(mres>0 and mres<=medgesound.length())
+{
+edgesound=medgesound[mres-1];
+speak("edge sound set");
+menusounds();
+}
+return m.get_item_name(mres);
+}
+int edges_callback(dynamic_menu_pro@ m, string data)
+{
+string edgesound;
+if(m.menu_position>0)
+edgesound=m.item_list[m.menu_position-1].name;
+if(key_down(KEY_SPACE) and m.menu_position>0 and spacehold==1 and keytimer.elapsed>=keytime)
+{
+string[] medge=find_files("sounds/menus/edge/"+edgesound+"/*edge*");
+pool.play_stationary("sounds/menus/edge/"+edgesound+"/"+medge[random(0,medge.length()-1)],false);
+keytimer.restart();
+}
+if(key_pressed(KEY_SPACE) and m.menu_position>0 and spacehold==0)
+{
+string[] medge=find_files("sounds/menus/edge/"+edgesound+"/*edge*");
+pool.play_stationary("sounds/menus/edge/"+edgesound+"/"+medge[random(0,medge.length()-1)],false);
+}
+return 0;
+}
+string entersmenu()
+{
+string[] mentersound=find_directories("sounds/menus/enter/*");
+setupmenu(true);
+m.set_callback(@enters_callback,"");
+for (uint i=0; i<mentersound.length(); i++)
+{
+m.add_item_tts(mentersound[i],mentersound[i],"",true);
+}
+int mres=m.run("Enter sound menu", true);
+if(mres==0)
+{
+menusounds();
+}
+if(mres==0 and mres>=mentersound.length())
+{
+menusounds();
+}
+if(mres>0 and mres<=mentersound.length())
+{
+entersound=mentersound[mres-1];
+speak("enter sound set");
+menusounds();
+}
+return m.get_item_name(mres);
+}
+int enters_callback(dynamic_menu_pro@ m, string data)
+{
+string entersound;
+if(m.menu_position>0)
+entersound=m.item_list[m.menu_position-1].name;
+if(key_down(KEY_SPACE) and m.menu_position>0 and spacehold==1 and keytimer.elapsed>=keytime)
+{
+string[] menter=find_files("sounds/menus/enter/"+entersound+"/*enter*");
+pool.play_stationary("sounds/menus/enter/"+entersound+"/"+menter[random(0,menter.length()-1)],false);
+keytimer.restart();
+}
+if(key_pressed(KEY_SPACE) and m.menu_position>0 and spacehold==0)
+{
+string[] menter=find_files("sounds/menus/enter/"+entersound+"/*enter*");
+pool.play_stationary("sounds/menus/enter/"+entersound+"/"+menter[random(0,menter.length()-1)],false);
+}
+return 0;
+}
+string opensmenu()
+{
+string[] mopensound=find_directories("sounds/menus/open/*");
+setupmenu(true);
+m.set_callback(@opens_callback,"");
+for (uint i=0; i<mopensound.length(); i++)
+{
+m.add_item_tts(mopensound[i],mopensound[i],"",true);
+}
+int mres=m.run("Open sound menu", true);
+if(mres==0)
+{
+menusounds();
+}
+if(mres==0 and mres>=mopensound.length())
+{
+menusounds();
+}
+if(mres>0 and mres<=mopensound.length())
+{
+opensound=mopensound[mres-1];
+speak("open sound set");
+menusounds();
+}
+return m.get_item_name(mres);
+}
+int opens_callback(dynamic_menu_pro@ m, string data)
+{
+string opensound;
+if(m.menu_position>0)
+opensound=m.item_list[m.menu_position-1].name;
+if(key_down(KEY_SPACE) and m.menu_position>0 and spacehold==1 and keytimer.elapsed>=keytime)
+{
+string[] mopen=find_files("sounds/menus/open/"+opensound+"/*open*");
+pool.play_stationary("sounds/menus/open/"+opensound+"/"+mopen[random(0,mopen.length()-1)],false);
+keytimer.restart();
+}
+if(key_pressed(KEY_SPACE) and m.menu_position>0 and spacehold==0)
+{
+string[] mopen=find_files("sounds/menus/open/"+opensound+"/*open*");
+pool.play_stationary("sounds/menus/open/"+opensound+"/"+mopen[random(0,mopen.length()-1)],false);
+}
+return 0;
+}
+string wrapsmenu()
+{
+string[] mrapsound=find_directories("sounds/menus/wrap/*");
+setupmenu(true);
+m.set_callback(@wraps_callback,"");
+for (uint i=0; i<mrapsound.length(); i++)
+{
+m.add_item_tts(mrapsound[i],mrapsound[i],"",true);
+}
+int mres=m.run("Wrap sound menu", true);
+if(mres==0)
+{
+menusounds();
+}
+if(mres==0 and mres>=mrapsound.length())
+{
+menusounds();
+}
+if(mres>0 and mres<=mrapsound.length())
+{
+wrapsound=mrapsound[mres-1];
+speak("wrap sound set");
+menusounds();
+}
+return m.get_item_name(mres);
+}
+int wraps_callback(dynamic_menu_pro@ m, string data)
+{
+string wrapsound;
+if(m.menu_position>0)
+wrapsound=m.item_list[m.menu_position-1].name;
+if(key_down(KEY_SPACE) and m.menu_position>0 and spacehold==1 and keytimer.elapsed>=keytime)
+{
+string[] mrap=find_files("sounds/menus/wrap/"+wrapsound+"/*wrap*");
+pool.play_stationary("sounds/menus/wrap/"+wrapsound+"/"+mrap[random(0,mrap.length()-1)],false);
+keytimer.restart();
+}
+if(key_pressed(KEY_SPACE) and m.menu_position>0 and spacehold==0)
+{
+string[] mrap=find_files("sounds/menus/wrap/"+wrapsound+"/*wrap*");
+pool.play_stationary("sounds/menus/wrap/"+wrapsound+"/"+mrap[random(0,mrap.length()-1)],false);
+}
+return 0;
+}

@@ -1,279 +1,8 @@
-int keytime=200, menumusic=0, spacehold=1, up_down=0, left_right=1, home_end=1, wrap=1, repeat_items=1, numbers=0, first_letter=1, position_info=0, side_scroll=0;
-string menutrack="part1";
-string clicksound="menuclick2";
-string edgesound="menuedge2";
-string entersound="menuenter27";
-string opensound="menuopen15";
-string wrapsound="menuwrap5";
-string[] mctrack=find_files("sounds/menus/music/"+menutrack+"/music*");
-string[] mclick=find_files("sounds/menus/click/"+clicksound+"/*click*");
-string[] menter=find_files("sounds/menus/enter/"+entersound+"/*enter*");
-string[] mopen=find_files("sounds/menus/open/"+opensound+"/*open*");
-string[] mrap=find_files("sounds/menus/wrap/"+wrapsound+"/*wrap*");
-string[] medge=find_files("sounds/menus/edge/"+edgesound+"/*edge*");
-timer keytimer;
-void setupmenu(bool main=false)
-{
-m.reset(true);
-if (main==true)
-m.add_music("sounds/menus/music/"+menutrack+"/"+mctrack[random(0,mctrack.length()-1)]);
-if(menumusic==0) m.music.volume=-100;
-if(up_down==1) m.enable_up_and_down=true;
-if(left_right==1) m.enable_left_and_right=true;
-if(home_end==1) m.enable_home_and_end=true;
-if(wrap==1) m.wrap=true;
-if(repeat_items==1) m.repeat_items_at_edges=true;
-if(numbers==1) m.enable_numbers=true;
-if(first_letter==1) m.enable_first_letter_navigation=true;
-if(position_info==1) m.speak_position_information=true;
-if(side_scroll==1) m.enable_side_scrolling=true;
-m.click_sound=("sounds/menus/click/"+clicksound+"/"+mclick[random(0,mclick.length()-1)]);
-m.edge_sound=("sounds/menus/edge/"+edgesound+"/"+medge[random(0,medge.length()-1)]);
-m.enter_sound=("sounds/menus/enter/"+entersound+"/"+menter[random(0,menter.length()-1)]);
-m.open_sound=("sounds/menus/open/"+opensound+"/"+mopen[random(0,mopen.length()-1)]);
-m.wrap_sound=("sounds/menus/wrap/"+wrapsound+"/"+mrap[random(0,mrap.length()-1)]);
-}
-void setupmenu2(bool main=false)
-{
-m.reset(true);
-if (main==true)
-m.enable_up_and_down=true;
-m.enable_left_and_right=false;
-m.enable_home_and_end=true;
-m.allow_escape=true;
-m.wrap=false;
-m.repeat_items_at_edges=true;
-m.enable_first_letter_navigation=false;
-m.speak_position_information=false;
-m.click_sound="none.ogg";
-m.enter_sound="none.ogg";
-m.open_sound="none.ogg";
-}
-string clicksmenu()
-{
-string[] mclicksound=find_directories("sounds/menus/click/*");
-setupmenu(true);
-m.set_callback(@clicks_callback,"");
-for (uint i=0; i<mclicksound.length(); i++)
-{
-m.add_item_tts(mclicksound[i],mclicksound[i],"",true);
-}
-int mres=m.run("Click sound menu", true);
-if(mres==0)
-{
-menusounds();
-}
-if(mres==0 and mres>=mclicksound.length())
-{
-menusounds();
-}
-if(mres>0 and mres<=mclicksound.length())
-{
-clicksound=mclicksound[mres-1];
-speak("click sound set");
-menusounds();
-}
-return m.get_item_name(mres);
-}
-int clicks_callback(dynamic_menu_pro@ m, string data)
-{
-string clicksound;
-if(m.menu_position>0)
-clicksound=m.item_list[m.menu_position-1].name;
-if(key_down(KEY_SPACE) and m.menu_position>0 and spacehold==1 and keytimer.elapsed>=keytime)
-{
-string[] mclick=find_files("sounds/menus/click/"+clicksound+"/*click*");
-pool.play_stationary("sounds/menus/click/"+clicksound+"/"+mclick[random(0,mclick.length()-1)],false);
-keytimer.restart();
-}
-if(key_pressed(KEY_SPACE) and m.menu_position>0 and spacehold==0)
-{
-string[] mclick=find_files("sounds/menus/click/"+clicksound+"/*click*");
-pool.play_stationary("sounds/menus/click/"+clicksound+"/"+mclick[random(0,mclick.length()-1)],false);
-}
-return 0;
-}
-string edgesmenu()
-{
-string[] medgesound=find_directories("sounds/menus/edge/*");
-setupmenu(true);
-m.set_callback(@edges_callback,"");
-for (uint i=0; i<medgesound.length(); i++)
-{
-m.add_item_tts(medgesound[i],medgesound[i],"",true);
-}
-int mres=m.run("edge sound menu", true);
-if(mres==0)
-{
-menusounds();
-}
-if(mres==0 and mres>=medgesound.length())
-{
-menusounds();
-}
-if(mres>0 and mres<=medgesound.length())
-{
-edgesound=medgesound[mres-1];
-speak("edge sound set");
-menusounds();
-}
-return m.get_item_name(mres);
-}
-int edges_callback(dynamic_menu_pro@ m, string data)
-{
-string edgesound;
-if(m.menu_position>0)
-edgesound=m.item_list[m.menu_position-1].name;
-if(key_down(KEY_SPACE) and m.menu_position>0 and spacehold==1 and keytimer.elapsed>=keytime)
-{
-string[] medge=find_files("sounds/menus/edge/"+edgesound+"/*edge*");
-pool.play_stationary("sounds/menus/edge/"+edgesound+"/"+medge[random(0,medge.length()-1)],false);
-keytimer.restart();
-}
-if(key_pressed(KEY_SPACE) and m.menu_position>0 and spacehold==0)
-{
-string[] medge=find_files("sounds/menus/edge/"+edgesound+"/*edge*");
-pool.play_stationary("sounds/menus/edge/"+edgesound+"/"+medge[random(0,medge.length()-1)],false);
-}
-return 0;
-}
-string entersmenu()
-{
-string[] mentersound=find_directories("sounds/menus/enter/*");
-setupmenu(true);
-m.set_callback(@enters_callback,"");
-for (uint i=0; i<mentersound.length(); i++)
-{
-m.add_item_tts(mentersound[i],mentersound[i],"",true);
-}
-int mres=m.run("Enter sound menu", true);
-if(mres==0)
-{
-menusounds();
-}
-if(mres==0 and mres>=mentersound.length())
-{
-menusounds();
-}
-if(mres>0 and mres<=mentersound.length())
-{
-entersound=mentersound[mres-1];
-speak("enter sound set");
-menusounds();
-}
-return m.get_item_name(mres);
-}
-int enters_callback(dynamic_menu_pro@ m, string data)
-{
-string entersound;
-if(m.menu_position>0)
-entersound=m.item_list[m.menu_position-1].name;
-if(key_down(KEY_SPACE) and m.menu_position>0 and spacehold==1 and keytimer.elapsed>=keytime)
-{
-string[] menter=find_files("sounds/menus/enter/"+entersound+"/*enter*");
-pool.play_stationary("sounds/menus/enter/"+entersound+"/"+menter[random(0,menter.length()-1)],false);
-keytimer.restart();
-}
-if(key_pressed(KEY_SPACE) and m.menu_position>0 and spacehold==0)
-{
-string[] menter=find_files("sounds/menus/enter/"+entersound+"/*enter*");
-pool.play_stationary("sounds/menus/enter/"+entersound+"/"+menter[random(0,menter.length()-1)],false);
-}
-return 0;
-}
-string opensmenu()
-{
-string[] mopensound=find_directories("sounds/menus/open/*");
-setupmenu(true);
-m.set_callback(@opens_callback,"");
-for (uint i=0; i<mopensound.length(); i++)
-{
-m.add_item_tts(mopensound[i],mopensound[i],"",true);
-}
-int mres=m.run("Open sound menu", true);
-if(mres==0)
-{
-menusounds();
-}
-if(mres==0 and mres>=mopensound.length())
-{
-menusounds();
-}
-if(mres>0 and mres<=mopensound.length())
-{
-opensound=mopensound[mres-1];
-speak("open sound set");
-menusounds();
-}
-return m.get_item_name(mres);
-}
-int opens_callback(dynamic_menu_pro@ m, string data)
-{
-string opensound;
-if(m.menu_position>0)
-opensound=m.item_list[m.menu_position-1].name;
-if(key_down(KEY_SPACE) and m.menu_position>0 and spacehold==1 and keytimer.elapsed>=keytime)
-{
-string[] mopen=find_files("sounds/menus/open/"+opensound+"/*open*");
-pool.play_stationary("sounds/menus/open/"+opensound+"/"+mopen[random(0,mopen.length()-1)],false);
-keytimer.restart();
-}
-if(key_pressed(KEY_SPACE) and m.menu_position>0 and spacehold==0)
-{
-string[] mopen=find_files("sounds/menus/open/"+opensound+"/*open*");
-pool.play_stationary("sounds/menus/open/"+opensound+"/"+mopen[random(0,mopen.length()-1)],false);
-}
-return 0;
-}
-string wrapsmenu()
-{
-string[] mrapsound=find_directories("sounds/menus/wrap/*");
-setupmenu(true);
-m.set_callback(@wraps_callback,"");
-for (uint i=0; i<mrapsound.length(); i++)
-{
-m.add_item_tts(mrapsound[i],mrapsound[i],"",true);
-}
-int mres=m.run("Wrap sound menu", true);
-if(mres==0)
-{
-menusounds();
-}
-if(mres==0 and mres>=mrapsound.length())
-{
-menusounds();
-}
-if(mres>0 and mres<=mrapsound.length())
-{
-wrapsound=mrapsound[mres-1];
-speak("wrap sound set");
-menusounds();
-}
-return m.get_item_name(mres);
-}
-int wraps_callback(dynamic_menu_pro@ m, string data)
-{
-string wrapsound;
-if(m.menu_position>0)
-wrapsound=m.item_list[m.menu_position-1].name;
-if(key_down(KEY_SPACE) and m.menu_position>0 and spacehold==1 and keytimer.elapsed>=keytime)
-{
-string[] mrap=find_files("sounds/menus/wrap/"+wrapsound+"/*wrap*");
-pool.play_stationary("sounds/menus/wrap/"+wrapsound+"/"+mrap[random(0,mrap.length()-1)],false);
-keytimer.restart();
-}
-if(key_pressed(KEY_SPACE) and m.menu_position>0 and spacehold==0)
-{
-string[] mrap=find_files("sounds/menus/wrap/"+wrapsound+"/*wrap*");
-pool.play_stationary("sounds/menus/wrap/"+wrapsound+"/"+mrap[random(0,mrap.length()-1)],false);
-}
-return 0;
-}
 void mainmenu()
 {
 setupmenu(true);
+m.add_item_tts("app menu", "weapon");
 m.add_item_tts("documentation menu", "help");
-m.add_item_tts("game menu", "weapon");
 m.add_item_tts("settings menu", "settings");
 m.add_item_tts("test speakers", "st");
 m.add_item_tts("restart", "rx");
@@ -289,7 +18,7 @@ exit();
 }
 if(main=="weapon")
 {
-gamemenu();
+appmenu();
 }
 if(main=="help")
 {
@@ -650,13 +379,13 @@ if(scm=="back")
 settingsmenu();
 }
 }
-void gamemenu()
+void appmenu()
 {
 setupmenu(true);
 m.add_item_tts("play", "shoot");
-m.add_item_tts("Game settings", "set");
+m.add_item_tts("app settings", "set");
 m.add_item_tts("back", "back");
-int mres=m.run("game menu",true);
+int mres=m.run("App menu",true);
 string gamem=m.get_item_name(mres);
 if(mres==0)
 {
@@ -669,41 +398,886 @@ wepsim();
 }
 if(gamem=="set")
 {
-gamepreffs();
+appepreffs();
 }
 if(gamem=="back")
 {
 mainmenu();
 }
 }
-void gamepreffs()
+void appepreffs()
 {
 setupmenu(true);
 m.add_item_tts("Set default health", "hp");
 m.add_item_tts("Set default shieldstrength", "sd");
 m.add_item_tts("back", "back");
-int mres=m.run("Game options",true);
+int mres=m.run("App options",true);
 string gamepm=m.get_item_name(mres);
 if(mres==0)
 {
-gamemenu();
+appmenu();
 }
 if(gamepm=="hp")
 {
 string hp=input.input("What would you like your default health to be set to?","10000");
 if(health=="")
-gamepreffs();
+appepreffs();
 health=string_to_number(hp);
 }
 if(gamepm=="sd")
 {
 string indurence=input.input("What would you like your default shield indurence to be set to?","10000");
 if(shieldstrength=="")
-gamepreffs();
+appepreffs();
 shieldstrength=string_to_number(indurence);
 }
 if(gamepm=="back")
 {
-gamemenu();
+appmenu();
 }
+}
+
+void cheatsmenu()
+{
+setupmenu(true);
+m.music.volume=-100;
+m.add_item_tts("health modifier,"+"currently set to;"+healthmod, "hpm");
+m.add_item_tts("healing modifier,"+"currently set to;"+healmod, "hlm");
+m.add_item_tts("life modifier,"+"currently set to;"+lifecard, "lvm");
+m.add_item_tts("shield strength modifier,"+"currently set to;"+shieldmod, "spm");
+m.add_item_tts("shield healing modifier,"+"currently set to;"+shealmod, "slm");
+m.add_item_tts("weapon cadigory,"+"currently set to;"+weaponcad, "wc");
+m.add_item_tts("weapon volume,"+"currently set to;"+weaponvolume, "stecibel");
+m.add_item_tts("weapon pan,"+"currently set to;"+weaponpan, "stalance");
+m.add_item_tts("weapon pitch,"+"currently set to;"+weaponpitch, "stemitone");
+m.add_item_tts("firing mode,"+"currently set to;"+wephold, "wm");
+m.add_item_tts("firing sound,"+"currently toggled to;"+firesound, "firs");
+m.add_item_tts("firing delay1,"+"currently set to;"+wep1delay, "fird1");
+m.add_item_tts("firing delay2,"+"currently set to;"+wep2delay, "fird2");
+m.add_item_tts("firing delay3,"+"currently set to;"+wep3delay, "fird3");
+m.add_item_tts("firing delay4,"+"currently set to;"+wep4delay, "fird4");
+m.add_item_tts("firing delay5,"+"currently set to;"+wep5delay, "fird5");
+m.add_item_tts("firing delay6,"+"currently set to;"+wep6delay, "fird6");
+m.add_item_tts("firing timer1,"+"currently set to;"+weapontime1, "firt1");
+m.add_item_tts("firing timer2,"+"currently set to;"+weapontime2, "firt2");
+m.add_item_tts("firing timer3,"+"currently set to;"+weapontime3, "firt3");
+m.add_item_tts("firing timer4,"+"currently set to;"+weapontime4, "firt4");
+m.add_item_tts("firing timer5,"+"currently set to;"+weapontime5, "firt5");
+m.add_item_tts("firing timer6,"+"currently set to;"+weapontime6, "firt6");
+m.add_item_tts("hit sound,"+"currently toggled to;"+hitsound, "imps");
+m.add_item_tts("pain sound,"+"currently toggled to;"+hurtsound, "imhs");
+m.add_item_tts("back", "back");
+int mres=m.run("Cheats menu",true);
+string wepms=m.get_item_name(mres);
+if(mres==0)
+{
+speak("canceled");
+return;
+}
+if(wepms=="stecibel")
+{
+string wepvol=input.input("What would you like the weapon volume to be set to?","0");
+if(weaponvolume=="")
+return;
+speak("weapon volume set");
+weaponvolume=string_to_number(wepvol);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+if(wepms=="stalance")
+{
+string weppan=input.input("What would you like the weapon pan to be set to?","0");
+if(weaponpan=="")
+return;
+speak("weapon pan set");
+weaponpan=string_to_number(weppan);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+if(wepms=="stemitone")
+{
+string weppitch=input.input("What would you like the weapon pitch to be set to?","100");
+if(weaponpitch=="")
+return;
+speak("weapon pitch set");
+weaponpitch=string_to_number(weppitch);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+if(wepms=="wm")
+{
+string weaponmode=input.input("What would you like the firing mode to be set to?","0");
+if(wephold=="")
+return;
+speak("firing mode set");
+wephold=string_to_number(weaponmode);
+}
+if(wepms=="hpm")
+{
+string hpmodifier=input.input("What would you like the player health modifier to be set to?","1");
+if(healthmod=="")
+return;
+speak("health mod set");
+healthmod=string_to_number(hpmodifier);
+}
+if(wepms=="hlm")
+{
+string hlmodifier=input.input("What would you like the player healing modifier to be set to?","50");
+if(healmod=="")
+return;
+speak("heal mod set");
+healmod=string_to_number(hlmodifier);
+}
+if(wepms=="lvm")
+{
+string lvmodifier=input.input("What would you like the life modifier to be set to?","1");
+if(lifecard=="")
+return;
+speak("life mod set");
+lifecard=string_to_number(lvmodifier);
+}
+if(wepms=="spm")
+{
+string spmodifier=input.input("What would you like the shield strength modifier to be set to?","1");
+if(shieldmod=="")
+return;
+speak("shield mod set");
+shieldmod=string_to_number(spmodifier);
+}
+if(wepms=="slm")
+{
+string slmodifier=input.input("What would you like the shield healing modifier to be set to?","50");
+if(shealmod=="")
+return;
+speak("sheal mod set");
+shealmod=string_to_number(slmodifier);
+}
+if(wepms=="firs")
+{
+string firsound=input.input("What would you like the fireing sound to be toggled to?","1");
+if(firesound=="")
+return;
+speak("fireing sound set");
+firesound=string_to_number(firsound);
+}
+if(wepms=="fird1")
+{
+string firdel1=input.input("What would you like the firing delay1 to be set to?","50");
+if(wep1delay=="")
+return;
+speak("fireing delay set");
+wep1delay=string_to_number(firdel1);
+}
+if(wepms=="fird2")
+{
+string firdel2=input.input("What would you like the firing delay2 to be set to?","100");
+if(wep2delay=="")
+return;
+speak("fireing delay set");
+wep2delay=string_to_number(firdel2);
+}
+if(wepms=="fird3")
+{
+string firdel3=input.input("What would you like the firing delay3 to be set to?","150");
+if(wep3delay=="")
+return;
+speak("fireing delay set");
+wep3delay=string_to_number(firdel3);
+}
+if(wepms=="fird4")
+{
+string firdel4=input.input("What would you like the firing delay4 to be set to?","200");
+if(wep4delay=="")
+return;
+speak("fireing delay set");
+wep4delay=string_to_number(firdel4);
+}
+if(wepms=="fird5")
+{
+string firdel5=input.input("What would you like the firing delay5 to be set to?","250");
+if(wep5delay=="")
+return;
+speak("fireing delay set");
+wep5delay=string_to_number(firdel5);
+}
+if(wepms=="fird6")
+{
+string firdel6=input.input("What would you like the firing delay6 to be set to?","300");
+if(wep6delay=="")
+return;
+speak("fireing delay set");
+wep6delay=string_to_number(firdel6);
+}
+if(wepms=="firt1")
+{
+string firtime1=input.input("What would you like the firing time1 to be set to?","50");
+if(weapontime1=="")
+return;
+speak("fireingtime set");
+weapontime1=string_to_number(firtime1);
+}
+if(wepms=="firt2")
+{
+string firtime2=input.input("What would you like the firing time2 to be set to?","100");
+if(weapontime2=="")
+return;
+speak("fireingtime set");
+weapontime2=string_to_number(firtime2);
+}
+if(wepms=="firt3")
+{
+string firtime3=input.input("What would you like the firing time3 to be set to?","150");
+if(weapontime3=="")
+return;
+speak("fireingtime set");
+weapontime3=string_to_number(firtime3);
+}
+if(wepms=="firt4")
+{
+string firtime4=input.input("What would you like the firing time4 to be set to?","200");
+if(weapontime4=="")
+return;
+speak("fireingtime set");
+weapontime4=string_to_number(firtime4);
+}
+if(wepms=="firt5")
+{
+string firtime5=input.input("What would you like the firing time5 to be set to?","250");
+if(weapontime5=="")
+return;
+speak("fireingtime set");
+weapontime5=string_to_number(firtime5);
+}
+if(wepms=="firt6")
+{
+string firtime6=input.input("What would you like the firing time6 to be set to?","300");
+if(weapontime6=="")
+return;
+speak("fireingtime set");
+weapontime6=string_to_number(firtime6);
+}
+if(wepms=="imps")
+{
+string impsound=input.input("What would you like the hit sound to be toggled to?","1");
+if(hitsound=="")
+return;
+speak("hit sound set");
+hitsound=string_to_number(impsound);
+}
+if(wepms=="imhs")
+{
+string imhsound=input.input("What would you like the pain sound to be toggled to?","0");
+if(hurtsound=="")
+return;
+speak("pain sound set");
+hurtsound=string_to_number(imhsound);
+}
+if(wepms=="wc")
+{
+string wepcad=input.input("What would you like the weapon cadigory to be set to?","1");
+if(weaponcad=="")
+return;
+speak("weapon cadigory set");
+weaponcad=string_to_number(wepcad);
+}
+if(wepms=="back")
+{
+return;
+}
+}
+void charsetmenu()
+{
+setupmenu(true);
+m.music.volume=-100;
+m.add_item_tts("fall sound,"+"currrently set to;"+falltype, "fls");
+m.add_item_tts("hurt sound,"+"currrently set to;"+paintype, "pns");
+m.add_item_tts("back", "back");
+int mres=m.run("Characters menu",true);
+string clm=m.get_item_name(mres);
+if(mres==0)
+{
+speak("canceled");
+return;
+}
+if(clm=="fls")
+{
+string res=fallsmenu();
+if(res!="")
+{
+falltype=res;
+}
+}
+if(clm=="pns")
+{
+string res=painsmenu();
+if(res!="")
+{
+paintype=res;
+}
+}
+if(clm=="back")
+{
+return;
+}
+}
+void weaponsmenu()
+{
+setupmenu(true);
+m.music.volume=-100;
+m.add_item_tts("All weapons,"+"currently set to;"+asasenater, "awps");
+m.add_item_tts("Archiry,"+"currently set to;"+archer, "arro");
+m.add_item_tts("Artillery,"+"currently set to;"+shooter, "shoot");
+m.add_item_tts("Explosive,"+"currently set to;"+bomber, "bomb");
+m.add_item_tts("Melee,"+"currently set to;"+striker, "swing");
+m.add_item_tts("Metical,"+"currently set to;"+healer, "rescue");
+m.add_item_tts("back", "back");
+int mres=m.run("Weapons menu",true);
+string wpsm=m.get_item_name(mres);
+if(mres==0)
+{
+speak("canceled");
+return;
+}
+if(wpsm=="awps")
+{
+string res=alwpsmenu();
+if(res!="")
+{
+asasenater=res;
+weaponcad=1;
+}
+}
+if(wpsm=="arro")
+{
+string res=archermenu();
+if(res!="")
+{
+archer=res;
+weaponcad=2;
+}
+}
+if(wpsm=="shoot")
+{
+string res=gunsmenu();
+if(res!="")
+{
+shooter=res;
+weaponcad=3;
+}
+}
+if(wpsm=="bomb")
+{
+string res=explodemenu();
+if(res!="")
+{
+bomber=res;
+weaponcad=4;
+}
+}
+if(wpsm=="swing")
+{
+string res=meleemenu();
+if(res!="")
+{
+striker=res;
+weaponcad=5;
+}
+}
+if(wpsm=="rescue")
+{
+string res=healingmenu();
+if(res!="")
+{
+healer=res;
+weaponcad=6;
+}
+}
+if(wpsm=="back")
+{
+return;
+}
+}
+string shieldsmenu()
+{
+string[] armer=find_directories("sounds/shields/*");
+setupmenu(true);
+m.music.volume=-100;
+m.set_callback(@shields_callback,"");
+for (uint i=0; i<armer.length(); i++)
+{
+m.add_item_tts(armer[i],armer[i]);
+}
+int mres=m.run("Shields menu", true);
+if(mres==0)
+{
+speak("canceled");
+}
+if(mres>0 and mres<=armer.length())
+{
+shieldtype=armer[mres-1];
+speak(shieldtype+";"+"equipped");
+string[] drawsfx=find_files("sounds/shields/"+shieldtype+"/*draw*");
+weaponslot=pool.play_stationary("sounds/shields/"+shieldtype+"/"+drawsfx[random(0,drawsfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+return m.get_item_name(mres);
+}
+int shields_callback(dynamic_menu_pro@ m, string data)
+{
+string shieldtype;
+if(m.menu_position>0)
+shieldtype=m.item_list[m.menu_position-1].name;
+if(key_down(KEY_SPACE) and m.menu_position>0 and spacehold==1 and keytimer.elapsed>=keytime)
+{
+string[] arqsfx=find_files("sounds/shields/"+shieldtype+"/*hit*");
+weaponslot=pool.play_stationary("sounds/shields/"+shieldtype+"/"+arqsfx[random(0,arqsfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+keytimer.restart();
+}
+if(key_pressed(KEY_SPACE) and m.menu_position>0 and spacehold==0)
+{
+string[] arqsfx=find_files("sounds/shields/"+shieldtype+"/*hit*");
+weaponslot=pool.play_stationary("sounds/shields/"+shieldtype+"/"+arqsfx[random(0,arqsfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+if(key_down(KEY_LCONTROL) and key_pressed(KEY_L) and m.menu_position>0 or key_down(KEY_RCONTROL) and key_pressed(KEY_H) and m.menu_position>0)
+{
+string[] drawsfx=find_files("sounds/shields/"+shieldtype+"/*draw*");
+weaponslot=pool.play_stationary("sounds/shields/"+shieldtype+"/"+drawsfx[random(0,drawsfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+if(key_down(KEY_LCONTROL) and key_pressed(KEY_H) and m.menu_position>0 or key_down(KEY_RCONTROL) and key_pressed(KEY_H) and m.menu_position>0)
+{
+string[] breaksfx=find_files("sounds/shields/"+shieldtype+"/*break*");
+weaponslot=pool.play_stationary("sounds/shields/"+shieldtype+"/"+breaksfx[random(0,breaksfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+return 0;
+}
+string alwpsmenu()
+{
+string[] anialaters=find_directories("sounds/weapons/all/*");
+setupmenu(true);
+m.music.volume=-100;
+m.set_callback(@weps_callback,"");
+for (uint i=0; i<anialaters.length(); i++)
+{
+m.add_item_tts(anialaters[i],anialaters[i]);
+}
+int mres=m.run("All weapons menu", true);
+if(mres==0)
+{
+weaponsmenu();
+}
+if(mres>0 and mres<=anialaters.length())
+{
+asasenater=anialaters[mres-1];
+speak(asasenater+";"+"equipped");
+string[] drawsfx=find_files("sounds/weapons/all/"+asasenater+"/*draw*");
+weaponslot=pool.play_stationary("sounds/weapons/all/"+asasenater+"/"+drawsfx[random(0,drawsfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+return m.get_item_name(mres);
+}
+int weps_callback(dynamic_menu_pro@ m, string data)
+{
+string asasenater;
+if(m.menu_position>0)
+asasenater=m.item_list[m.menu_position-1].name;
+if(key_down(KEY_SPACE) and m.menu_position>0 and spacehold==1 and keytimer.elapsed>=keytime)
+{
+string[] firesfx=find_files("sounds/weapons/all/"+asasenater+"/*fire*");
+weaponslot=pool.play_stationary("sounds/weapons/all/"+asasenater+"/"+firesfx[random(0,firesfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+keytimer.restart();
+}
+if(key_pressed(KEY_SPACE) and m.menu_position>0 and spacehold==0)
+{
+string[] firesfx=find_files("sounds/weapons/all/"+asasenater+"/*fire*");
+weaponslot=pool.play_stationary("sounds/weapons/all/"+asasenater+"/"+firesfx[random(0,firesfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+if(key_down(KEY_LCONTROL) and key_pressed(KEY_L) and m.menu_position>0 or key_down(KEY_RCONTROL) and key_pressed(KEY_H) and m.menu_position>0)
+{
+string[] drawsfx=find_files("sounds/weapons/all/"+asasenater+"/*draw*");
+weaponslot=pool.play_stationary("sounds/weapons/all/"+asasenater+"/"+drawsfx[random(0,drawsfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+if(key_down(KEY_LCONTROL) and key_pressed(KEY_H) and m.menu_position>0 or key_down(KEY_RCONTROL) and key_pressed(KEY_H) and m.menu_position>0)
+{
+string[] hitsfx=find_files("sounds/weapons/all/"+asasenater+"/*hit*");
+weaponslot=pool.play_stationary("sounds/weapons/all/"+asasenater+"/"+hitsfx[random(0,hitsfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+return 0;
+}
+string archermenu()
+{
+string[] hunters=find_directories("sounds/weapons/archery/*");
+setupmenu(true);
+m.music.volume=-100;
+m.set_callback(@archers_callback,"");
+for (uint i=0; i<hunters.length(); i++)
+{
+m.add_item_tts(hunters[i],hunters[i]);
+}
+int mres=m.run("Archery menu", true);
+if(mres==0)
+{
+weaponsmenu();
+}
+if(mres>0 and mres<=hunters.length())
+{
+archer=hunters[mres-1];
+speak(archer+";"+"equipped");
+string[] drawsfx=find_files("sounds/weapons/archery/"+archer+"/*draw*");
+weaponslot=pool.play_stationary("sounds/weapons/archery/"+archer+"/"+drawsfx[random(0,drawsfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+return m.get_item_name(mres);
+}
+int archers_callback(dynamic_menu_pro@ m, string data)
+{
+string archer;
+if(m.menu_position>0)
+archer=m.item_list[m.menu_position-1].name;
+if(key_down(KEY_SPACE) and m.menu_position>0 and spacehold==1 and keytimer.elapsed>=keytime)
+{
+string[] firesfx=find_files("sounds/weapons/archery/"+archer+"/*fire*");
+weaponslot=pool.play_stationary("sounds/weapons/archery/"+archer+"/"+firesfx[random(0,firesfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+keytimer.restart();
+}
+if(key_pressed(KEY_SPACE) and m.menu_position>0 and spacehold==0)
+{
+string[] firesfx=find_files("sounds/weapons/archery/"+archer+"/*fire*");
+weaponslot=pool.play_stationary("sounds/weapons/archery/"+archer+"/"+firesfx[random(0,firesfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+if(key_down(KEY_LCONTROL) and key_pressed(KEY_L) and m.menu_position>0 or key_down(KEY_RCONTROL) and key_pressed(KEY_H) and m.menu_position>0)
+{
+string[] drawsfx=find_files("sounds/weapons/archery/"+archer+"/*draw*");
+weaponslot=pool.play_stationary("sounds/weapons/archery/"+archer+"/"+drawsfx[random(0,drawsfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+if(key_down(KEY_LCONTROL) and key_pressed(KEY_H) and m.menu_position>0 or key_down(KEY_RCONTROL) and key_pressed(KEY_H) and m.menu_position>0)
+{
+string[] hitsfx=find_files("sounds/weapons/archery/"+archer+"/*hit*");
+weaponslot=pool.play_stationary("sounds/weapons/archery/"+archer+"/"+hitsfx[random(0,hitsfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+return 0;
+}
+string gunsmenu()
+{
+string[] fighters=find_directories("sounds/weapons/artillery/*");
+setupmenu(true);
+m.music.volume=-100;
+m.set_callback(@guns_callback,"");
+for (uint i=0; i<fighters.length(); i++)
+{
+m.add_item_tts(fighters[i],fighters[i]);
+}
+int mres=m.run("Artillery menu", true);
+if(mres==0)
+{
+weaponsmenu();
+}
+if(mres>0 and mres<=fighters.length())
+{
+shooter=fighters[mres-1];
+speak(shooter+";"+"equipped");
+string[] drawsfx=find_files("sounds/weapons/artillery/"+shooter+"/*draw*");
+weaponslot=pool.play_stationary("sounds/weapons/artillery/"+shooter+"/"+drawsfx[random(0,drawsfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+return m.get_item_name(mres);
+}
+int guns_callback(dynamic_menu_pro@ m, string data)
+{
+string shooter;
+if(m.menu_position>0)
+shooter=m.item_list[m.menu_position-1].name;
+if(key_down(KEY_SPACE) and m.menu_position>0 and spacehold==1 and keytimer.elapsed>=keytime)
+{
+string[] firesfx=find_files("sounds/weapons/artillery/"+shooter+"/*fire*");
+weaponslot=pool.play_stationary("sounds/weapons/artillery/"+shooter+"/"+firesfx[random(0,firesfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+keytimer.restart();
+}
+if(key_pressed(KEY_SPACE) and m.menu_position>0 and spacehold==0)
+{
+string[] firesfx=find_files("sounds/weapons/artillery/"+shooter+"/*fire*");
+weaponslot=pool.play_stationary("sounds/weapons/artillery/"+shooter+"/"+firesfx[random(0,firesfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+if(key_down(KEY_LCONTROL) and key_pressed(KEY_L) and m.menu_position>0 or key_down(KEY_RCONTROL) and key_pressed(KEY_H) and m.menu_position>0)
+{
+string[] drawsfx=find_files("sounds/weapons/artillery/"+shooter+"/*draw*");
+weaponslot=pool.play_stationary("sounds/weapons/artillery/"+shooter+"/"+drawsfx[random(0,drawsfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+if(key_down(KEY_LCONTROL) and key_pressed(KEY_H) and m.menu_position>0 or key_down(KEY_RCONTROL) and key_pressed(KEY_H) and m.menu_position>0)
+{
+string[] hitsfx=find_files("sounds/weapons/artillery/"+shooter+"/*hit*");
+weaponslot=pool.play_stationary("sounds/weapons/artillery/"+shooter+"/"+hitsfx[random(0,hitsfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+return 0;
+}
+string explodemenu()
+{
+string[] killers=find_directories("sounds/weapons/explosive/*");
+setupmenu(true);
+m.music.volume=-100;
+m.set_callback(@bombs_callback,"");
+for (uint i=0; i<killers.length(); i++)
+{
+m.add_item_tts(killers[i],killers[i]);
+}
+int mres=m.run("Explosive menu", true);
+if(mres==0)
+{
+weaponsmenu();
+}
+if(mres>0 and mres<=killers.length())
+{
+bomber=killers[mres-1];
+speak(bomber+";"+"equipped");
+string[] drawsfx=find_files("sounds/weapons/explosive/"+bomber+"/*draw*");
+weaponslot=pool.play_stationary("sounds/weapons/explosive/"+bomber+"/"+drawsfx[random(0,drawsfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+return m.get_item_name(mres);
+}
+int bombs_callback(dynamic_menu_pro@ m, string data)
+{
+string bomber;
+if(m.menu_position>0)
+bomber=m.item_list[m.menu_position-1].name;
+if(key_down(KEY_SPACE) and m.menu_position>0 and spacehold==1 and keytimer.elapsed>=keytime)
+{
+string[] firesfx=find_files("sounds/weapons/explosive/"+bomber+"/*fire*");
+weaponslot=pool.play_stationary("sounds/weapons/explosive/"+bomber+"/"+firesfx[random(0,firesfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+keytimer.restart();
+}
+if(key_pressed(KEY_SPACE) and m.menu_position>0 and spacehold==0)
+{
+string[] firesfx=find_files("sounds/weapons/explosive/"+bomber+"/*fire*");
+weaponslot=pool.play_stationary("sounds/weapons/explosive/"+bomber+"/"+firesfx[random(0,firesfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+if(key_down(KEY_LCONTROL) and key_pressed(KEY_L) and m.menu_position>0 or key_down(KEY_RCONTROL) and key_pressed(KEY_H) and m.menu_position>0)
+{
+string[] drawsfx=find_files("sounds/weapons/explosive/"+bomber+"/*draw*");
+weaponslot=pool.play_stationary("sounds/weapons/explosive/"+bomber+"/"+drawsfx[random(0,drawsfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+if(key_down(KEY_LCONTROL) and key_pressed(KEY_H) and m.menu_position>0 or key_down(KEY_RCONTROL) and key_pressed(KEY_H) and m.menu_position>0)
+{
+string[] hitsfx=find_files("sounds/weapons/explosive/"+bomber+"/*hit*");
+weaponslot=pool.play_stationary("sounds/weapons/explosive/"+bomber+"/"+hitsfx[random(0,hitsfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+return 0;
+}
+string meleemenu()
+{
+string[] brawlers=find_directories("sounds/weapons/melee/*");
+setupmenu(true);
+m.music.volume=-100;
+m.set_callback(@swords_callback,"");
+for (uint i=0; i<brawlers.length(); i++)
+{
+m.add_item_tts(brawlers[i],brawlers[i]);
+}
+int mres=m.run("Melee menu", true);
+if(mres==0)
+{
+weaponsmenu();
+}
+if(mres>0 and mres<=brawlers.length())
+{
+striker=brawlers[mres-1];
+speak(striker+";"+"equipped");
+string[] drawsfx=find_files("sounds/weapons/melee/"+striker+"/*draw*");
+weaponslot=pool.play_stationary("sounds/weapons/melee/"+striker+"/"+drawsfx[random(0,drawsfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+return m.get_item_name(mres);
+}
+int swords_callback(dynamic_menu_pro@ m, string data)
+{
+string striker;
+if(m.menu_position>0)
+striker=m.item_list[m.menu_position-1].name;
+if(key_down(KEY_SPACE) and m.menu_position>0 and spacehold==1 and keytimer.elapsed>=keytime)
+{
+string[] firesfx=find_files("sounds/weapons/melee/"+striker+"/*fire*");
+weaponslot=pool.play_stationary("sounds/weapons/melee/"+striker+"/"+firesfx[random(0,firesfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+keytimer.restart();
+}
+if(key_pressed(KEY_SPACE) and m.menu_position>0 and spacehold==0)
+{
+string[] firesfx=find_files("sounds/weapons/melee/"+striker+"/*fire*");
+weaponslot=pool.play_stationary("sounds/weapons/melee/"+striker+"/"+firesfx[random(0,firesfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+if(key_down(KEY_LCONTROL) and key_pressed(KEY_L) and m.menu_position>0 or key_down(KEY_RCONTROL) and key_pressed(KEY_H) and m.menu_position>0)
+{
+string[] drawsfx=find_files("sounds/weapons/melee/"+striker+"/*draw*");
+weaponslot=pool.play_stationary("sounds/weapons/melee/"+striker+"/"+drawsfx[random(0,drawsfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+if(key_down(KEY_LCONTROL) and key_pressed(KEY_H) and m.menu_position>0 or key_down(KEY_RCONTROL) and key_pressed(KEY_H) and m.menu_position>0)
+{
+string[] hitsfx=find_files("sounds/weapons/melee/"+striker+"/*hit*");
+weaponslot=pool.play_stationary("sounds/weapons/melee/"+striker+"/"+hitsfx[random(0,hitsfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+return 0;
+}
+string healingmenu()
+{
+string[] asisters=find_directories("sounds/weapons/metical/*");
+setupmenu(true);
+m.music.volume=-100;
+m.set_callback(@metics_callback,"");
+for (uint i=0; i<asisters.length(); i++)
+{
+m.add_item_tts(asisters[i],asisters[i]);
+}
+int mres=m.run("Metical menu", true);
+if(mres==0)
+{
+weaponsmenu();
+}
+if(mres>0 and mres<=asisters.length())
+{
+healer=asisters[mres-1];
+speak(healer+";"+"equipped");
+string[] drawsfx=find_files("sounds/weapons/metical/"+healer+"/*draw*");
+weaponslot=pool.play_stationary("sounds/weapons/metical/"+healer+"/"+drawsfx[random(0,drawsfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+return m.get_item_name(mres);
+}
+int metics_callback(dynamic_menu_pro@ m, string data)
+{
+string healer;
+if(m.menu_position>0)
+healer=m.item_list[m.menu_position-1].name;
+if(key_down(KEY_SPACE) and m.menu_position>0 and spacehold==1 and keytimer.elapsed>=keytime)
+{
+string[] firesfx=find_files("sounds/weapons/metical/"+healer+"/*fire*");
+weaponslot=pool.play_stationary("sounds/weapons/metical/"+healer+"/"+firesfx[random(0,firesfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+keytimer.restart();
+}
+if(key_pressed(KEY_SPACE) and m.menu_position>0 and spacehold==0)
+{
+string[] firesfx=find_files("sounds/weapons/metical/"+healer+"/*fire*");
+weaponslot=pool.play_stationary("sounds/weapons/metical/"+healer+"/"+firesfx[random(0,firesfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+if(key_down(KEY_LCONTROL) and key_pressed(KEY_L) and m.menu_position>0 or key_down(KEY_RCONTROL) and key_pressed(KEY_H) and m.menu_position>0)
+{
+string[] drawsfx=find_files("sounds/weapons/metical/"+healer+"/*draw*");
+weaponslot=pool.play_stationary("sounds/weapons/metical/"+healer+"/"+drawsfx[random(0,drawsfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+if(key_down(KEY_LCONTROL) and key_pressed(KEY_H) and m.menu_position>0 or key_down(KEY_RCONTROL) and key_pressed(KEY_H) and m.menu_position>0)
+{
+string[] hitsfx=find_files("sounds/weapons/metical/"+healer+"/*hit*");
+weaponslot=pool.play_stationary("sounds/weapons/metical/"+healer+"/"+hitsfx[random(0,hitsfx.length()-1)],false);
+pool.update_sound_start_values(weaponslot,weaponpan,weaponvolume,weaponpitch);
+}
+return 0;
+}
+string painsmenu()
+{
+string[] charpains=find_directories("sounds/characters/pains/*");
+setupmenu(true);
+m.music.volume=-100;
+m.set_callback(@pains_callback,"");
+for (uint i=0; i<charpains.length(); i++)
+{
+m.add_item_tts(charpains[i],charpains[i],"",true);
+}
+int mres=m.run("hurt sound menu", true);
+if(mres==0)
+{
+charsetmenu();
+}
+if(mres>0 and mres<=charpains.length())
+{
+speak("hurt sound set");
+}
+return m.get_item_name(mres);
+}
+int pains_callback(dynamic_menu_pro@ m, string data)
+{
+string paintype;
+if(m.menu_position>0)
+paintype=m.item_list[m.menu_position-1].name;
+if(key_down(KEY_SPACE) and m.menu_position>0 and spacehold==1 and keytimer.elapsed>=keytime)
+{
+string[] hurtsfx=find_files("sounds/characters/pains/"+paintype+"/*hurt*");
+weaponslot=pool.play_stationary("sounds/characters/pains/"+paintype+"/"+hurtsfx[random(0,hurtsfx.length()-1)],false);
+keytimer.restart();
+}
+if(key_pressed(KEY_SPACE) and m.menu_position>0 and spacehold==0)
+{
+string[] hurtsfx=find_files("sounds/characters/pains/"+paintype+"/*hurt*");
+weaponslot=pool.play_stationary("sounds/characters/pains/"+paintype+"/"+hurtsfx[random(0,hurtsfx.length()-1)],false);
+}
+if(key_down(KEY_LCONTROL) and key_pressed(KEY_L) and m.menu_position>0 or key_down(KEY_RCONTROL) and key_pressed(KEY_H) and m.menu_position>0)
+{
+string[] drawsfx=find_files("sounds/characters/pains/"+paintype+"/*name*");
+weaponslot=pool.play_stationary("sounds/characters/pains/"+paintype+"/"+drawsfx[random(0,drawsfx.length()-1)],false);
+}
+if(key_down(KEY_LCONTROL) and key_pressed(KEY_H) and m.menu_position>0 or key_down(KEY_RCONTROL) and key_pressed(KEY_H) and m.menu_position>0)
+{
+string[] defsfx=find_files("sounds/characters/pains/"+paintype+"/*death*");
+weaponslot=pool.play_stationary("sounds/characters/pains/"+paintype+"/"+defsfx[random(0,defsfx.length()-1)],false);
+}
+return 0;
+}
+string fallsmenu()
+{
+string[] charfalls=find_directories("sounds/characters/falls/*");
+setupmenu(true);
+m.music.volume=-100;
+m.set_callback(@falls_callback,"");
+for (uint i=0; i<charfalls.length(); i++)
+{
+m.add_item_tts(charfalls[i],charfalls[i],"",true);
+}
+int mres=m.run("fall sound menu", true);
+if(mres==0)
+{
+charsetmenu();
+}
+if(mres>0 and mres<=charfalls.length())
+{
+speak("fall sound set");
+}
+return m.get_item_name(mres);
+}
+int falls_callback(dynamic_menu_pro@ m, string data)
+{
+string falltype;
+if(m.menu_position>0)
+falltype=m.item_list[m.menu_position-1].name;
+if(key_down(KEY_SPACE) and m.menu_position>0 and spacehold==1 and keytimer.elapsed>=keytime)
+{
+string[] falsfx=find_files("sounds/characters/falls/"+falltype+"/*fall*");
+falslot=pool.play_stationary("sounds/characters/falls/"+falltype+"/"+falsfx[random(0,falsfx.length()-1)],false);
+keytimer.restart();
+}
+if(key_pressed(KEY_SPACE) and m.menu_position>0 and spacehold==0)
+{
+string[] falsfx=find_files("sounds/characters/falls/"+falltype+"/*fall*");
+falslot=pool.play_stationary("sounds/characters/falls/"+falltype+"/"+falsfx[random(0,falsfx.length()-1)],false);
+}
+return 0;
 }

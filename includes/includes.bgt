@@ -3,8 +3,7 @@
 #include"key_hold.bgt"
 #include"menu.bgt"
 #include"m_pro.bgt"
-#include"prepgame.bgt"
+#include"setupmenu.bgt"
 #include"sound_pool.bgt"
 #include "text_input.bgt"
-#include"weaponsym.bgt"
 typedef uint8 usmall; typedef int8 small;
